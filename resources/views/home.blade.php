@@ -12,7 +12,11 @@
 
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-3xl font-bold text-center mb-8">Social App</h1>
+        @if(!auth()->check())
+        <a href="{{ route('login') }}" class="float-right">Login</a>
+        <a href="{{ route('register') }}" class="float-right mr-8">Register</a>
 
+        @endif
         @auth
         <form method="post" action="{{ route('logout') }}" class="float-right ml-2">
             @csrf
@@ -29,6 +33,7 @@
             </form>
         </div>
         @endauth
+      
 
         <div id="posts">
             @foreach ($posts as $post)

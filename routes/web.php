@@ -7,6 +7,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DashbaordController;
+use App\Http\Controllers\EmployeeController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -39,6 +40,10 @@ Route::get('/', [PostController::class, 'index'])->name('home');
 Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
 Route::post('/likes', [LikeController::class, 'store'])->name('likes.store');
 Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+Route::get('/employee', [EmployeeController::class, 'create']);
+Route::post('/employee/store', [EmployeeController::class, 'store'])->name('employees.store');
+Route::get('/employee/list', [EmployeeController::class, 'index']);
+
 
 
 
