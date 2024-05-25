@@ -24,18 +24,24 @@
                     <input
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         id="name" type="text" name="name" required>
+                    <div class="error" id="name-error" style="color: red;"></div>
+
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="dob">Date of Birth</label>
                     <input
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         id="dob" type="date" name="dob" required>
+                    <div class="error" id="dob-error" style="color: red;"></div>
+
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="phone">Phone</label>
                     <input
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         id="phone" type="text" name="phone" required>
+                    <div class="error" id="phone-error" style="color: red;"></div>
+
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="gender">Status</label>
@@ -51,6 +57,8 @@
                     <input
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         id="email" type="email" name="email" required>
+                    <div class="error" id="email-error" style="color: red;"></div>
+
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="hobbies">Hobbies</label>
@@ -86,8 +94,8 @@
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="gender">Gender</label>
                     <div class="flex items-center">
                         <label class="inline-flex items-center mr-4">
-                            <input type="radio" class="form-radio h-5 w-5 text-gray-600" name="gender" value="Male" checked
-                                required>
+                            <input type="radio" class="form-radio h-5 w-5 text-gray-600" name="gender"
+                                value="Male" checked required>
                             <span class="ml-2 text-gray-700">Male</span>
                         </label>
                         <label class="inline-flex items-center mr-4">
@@ -136,7 +144,7 @@
             </table>
         </div>
     </div>
-    
+
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
@@ -191,23 +199,95 @@
                 });
             }
 
+            //validation when user type in input fields
+            $("input[name='name']").on('input', function() {
+                var name = $(this).val().trim();
+                var namePattern = /^[a-zA-Z\s]+$/;
+                if (name === "") {
+                    $("#name-error").text("Name is required");
+                } else if (!namePattern.test(name)) {
+                    $("#name-error").text("Name should not contain numbers or special characters");
+                } else {
+                    $("#name-error").text("");
+                }
+            });
+
+            $("input[name='email']").on('input', function() {
+                var email = $(this).val().trim();
+                var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                if (email === "") {
+                    $("#email-error").text("Email is required").css("color", "red");
+                } else if (!emailPattern.test(email)) {
+                    $("#email-error").text("Invalid email format").css("color", "red");
+                } else {
+                    $("#email-error").text("");
+                }
+            });
+
+            $(document).ready(function() {
+                $("input[name='phone']").on('input', function() {
+                    var phone = $(this).val().trim();
+                    var phonePattern = /^\d{10}$/;
+
+                    if (phone === "") {
+                        $("#phone-error").text("Phone number is required").css("color", "red");
+                    } else if (!phonePattern.test(phone)) {
+                        $("#phone-error").text("Phone number must be 10 digits number").css("color",
+                            "red");
+                    } else {
+                        $("#phone-error").text("");
+                    }
+                });
+            });
+
+            $("input[name='dob']").on('input', function() {
+                var dob = $(this).val().trim();
+                var dobDate = new Date(dob);
+                var currentDate = new Date();
+                var eighteenYearsAgo = new Date(currentDate.getFullYear() - 18, currentDate.getMonth(),
+                    currentDate.getDate());
+
+                if (dob === "") {
+                    $("#dob-error").text("Date of Birth is required").css("color", "red");
+                } else if (dobDate > eighteenYearsAgo) {
+                    $("#dob-error").text("You must be at least 18 years old").css("color", "red");
+                } else {
+                    $("#dob-error").text("");
+                }
+            });
 
             //create employee
             $('#btn').click(function(e) {
                 e.preventDefault();
-                $.ajax({
-                    url: "{{ url('employee/store') }}",
-                    type: "post",
-                    dataType: "json",
-                    data: $('#myform').serialize(),
-                    // headers: {
-                    // 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    // },
-                    success: function(response) {
-                        $('#myform')[0].reset();
-                        console.log(response);
+                var isValid = true;
+                $("input[name='name']").trigger('input');
+                $("input[name='email']").trigger('input');
+                $("input[name='dob']").trigger('input');
+                $("input[name='phone']").trigger('input');
+
+                $(".error").each(function() {
+                    if ($(this).text() !== "") {
+                        isValid = false;
                     }
-                })
+                });
+
+                if (isValid) {
+                    $.ajax({
+                        url: "{{ url('employee/store') }}",
+                        type: "post",
+                        dataType: "json",
+                        data: $('#myform').serialize(),
+                        // headers: {
+                        // 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        // },
+                        success: function(response) {
+                            $('#myform')[0].reset();
+                            fetchEmployees();
+                            console.log(response);
+                        }
+                    })
+                }
             })
 
             // Edit employee
@@ -250,30 +330,44 @@
             // Update employee
             $('#update-btn').click(function(e) {
                 e.preventDefault();
-                let employeeId = $('#employeeId').val();
-                let formData = $('#myform').serialize();
-                $.ajax({
-                    url: `{{ url('employee/update') }}/${employeeId}`,
-                    type: "PUT",
-                    dataType: "json",
-                    data: formData,
-                    success: function(response) {
-                        console.log(response);
-                        if (response.status === 'success') {
-                            $('#myform')[0].reset();
-                            $('#update-btn').addClass('hidden');
-                            $('#btn').removeClass('hidden');
+                var isValid = true;
+                $("input[name='name']").trigger('input');
+                $("input[name='email']").trigger('input');
+                $("input[name='dob']").trigger('input');
+                $("input[name='phone']").trigger('input');
 
-                            fetchEmployees(); // Fetch the updated employee list
-                            console.log(response.message);
-                        } else {
-                            console.error(response.message);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error updating employee data:', error);
+                $(".error").each(function() {
+                    if ($(this).text() !== "") {
+                        isValid = false;
                     }
                 });
+
+                if (isValid) {
+                    let employeeId = $('#employeeId').val();
+                    let formData = $('#myform').serialize();
+                    $.ajax({
+                        url: `{{ url('employee/update') }}/${employeeId}`,
+                        type: "PUT",
+                        dataType: "json",
+                        data: formData,
+                        success: function(response) {
+                            console.log(response);
+                            if (response.status === 'success') {
+                                $('#myform')[0].reset();
+                                $('#update-btn').addClass('hidden');
+                                $('#btn').removeClass('hidden');
+
+                                fetchEmployees(); // Fetch the updated employee list
+                                console.log(response.message);
+                            } else {
+                                console.error(response.message);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error updating employee data:', error);
+                        }
+                    });
+                }
             });
 
 
