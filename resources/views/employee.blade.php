@@ -65,7 +65,7 @@
                     <div class="flex flex-wrap">
                         <label class="inline-flex items-center mr-4 mb-2">
                             <input type="checkbox" class="form-checkbox h-5 w-5 text-gray-600" name="hobbies[]"
-                                value="Reading">
+                                value="Reading" checked>
                             <span class="ml-2 text-gray-700">Reading</span>
                         </label>
                         <label class="inline-flex items-center mr-4 mb-2">
@@ -89,6 +89,7 @@
                             <span class="ml-2 text-gray-700">Gaming</span>
                         </label>
                     </div>
+                    <div class="error" id="hobbies-error" style="color: red;"></div>
                 </div>
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="gender">Gender</label>
@@ -257,6 +258,15 @@
                 }
             });
 
+            $('input[name="hobbies[]"]').on('change', function() {
+                var selectedHobbies = $('input[name="hobbies[]"]:checked').length;
+                if (selectedHobbies < 1) {
+                    $("#hobbies-error").text("At least one hobby is required").css("color", "red");
+                } else {
+                    $("#hobbies-error").text("");
+                }
+            });
+
             //create employee
             $('#btn').click(function(e) {
                 e.preventDefault();
@@ -265,6 +275,7 @@
                 $("input[name='email']").trigger('input');
                 $("input[name='dob']").trigger('input');
                 $("input[name='phone']").trigger('input');
+                $("input[name='hobbies[]']").trigger('change');
 
                 $(".error").each(function() {
                     if ($(this).text() !== "") {
