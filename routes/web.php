@@ -43,6 +43,10 @@ Route::post('/comments', [CommentController::class, 'store'])->name('comments.st
 Route::get('/employee', [EmployeeController::class, 'create']);
 Route::post('/employee/store', [EmployeeController::class, 'store'])->name('employees.store');
 Route::get('/employee/list', [EmployeeController::class, 'index']);
+Route::get('/employee/edit/{employeeId}', [EmployeeController::class, 'edit']);
+Route::put('/employee/update/{employee}', [EmployeeController::class, 'update']);
+Route::delete('/employee/delete/{employeeId}', [EmployeeController::class, 'destroy']);
+
 
 
 
